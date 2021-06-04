@@ -3,7 +3,7 @@
 #### 작업공간 : [노션](https://www.notion.so/12-c7b8bb83f4a74fa1bb96c4eb45b9fe3f), 게더타운, 카톡
 <br>
 
-## 이미지
+## 결과
 * <details>
   <summary>
   펼쳐보기
