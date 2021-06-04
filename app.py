@@ -177,6 +177,9 @@ def piechart():
             'date': False,
         })
 
+    if (day_data == None):
+        return jsonify({'res': False, 'msg': "해당 데이터가 없습니다"})
+
     # sum_time 에 카테고리마다 할당된 시간을 합산합니다.
     sum_time = {}
     # 해당 날짜의 모든 did 중
@@ -227,15 +230,21 @@ def avgimmerse():
         {'id': id, 'date': date},
         {'_id': False, 'id': False, 'date': False}
     )
+
+    if daily_data == None:
+        return jsonify({'res': False, 'msg': "평균을 합산하기 위한 데이터가 충분하지 않습니다"})
     # 평균 몰입도
     avg_immerse = 0
+    len_immerse = 0
     # 모든 데이터에서 immerse 값을 더합니다.
     for did in daily_data['did']:
-        avg_immerse += float(did['time_score'])
+        if did['time_score'] != '':
+            avg_immerse += float(did['time_score'])
+            len_immerse += 1
 
     # 그 값을 총 데이터의 수로 나눕니다.
-    if len(daily_data) != 0:
-        avg_immerse = avg_immerse / len(daily_data['did'])
+    if len(daily_data) != 0 or len(daily_data['did']) != 0:
+        avg_immerse = avg_immerse / len_immerse
 
     return jsonify({'res': True, 'msg': "평균 몰입도를 받았습니다", 'val': avg_immerse})
 

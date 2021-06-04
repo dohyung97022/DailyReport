@@ -8,22 +8,26 @@
   <summary>
   펼쳐보기
   </summary>
+    <br>
 
     ![](img/index1.PNG)    
-    today time table
+    today time table   
     <br>    
 
     ![](img/index2.PNG)   
-    그래프 기능
-  
+    그래프 기능   
+    <br>
+
     ![](img/index3_login.PNG)   
-    로그인 기능
+    로그인 기능   
+    <br>
 
     ![](img/index4_save.PNG)   
-    데이터 저장 기능
-  
+    데이터 저장 기능   
+    <br>
+
     ![](img/index5_saved.PNG)   
-    mongoDB 저장 형식
+    mongoDB 저장 형식   
   </details>
   <br>
 
@@ -31,6 +35,7 @@
 * ## Project
     * <details>
         <summary>아이디어</summary>
+        <br>
         
         Daily report 라는 아이디어를 결정하기 전에    
         팀원들과의 지속적인 소통을 많은 아이디어가 제시되었습니다.   
@@ -62,6 +67,7 @@
         
     * <details>
         <summary>사용 기술</summary>
+        <br>
 
         frontend : jQuery, ajax, html, css, bootstrap   
         backend : python, flask, mongoDB   
@@ -75,6 +81,7 @@
 * ## Frontend
     * <details>
         <summary>디자인</summary>
+        <br>
         
         전체적인 디자인이 나오기까지 팀원분들의 의견과 디자인을 종합하며 발전시켰습니다.   
         frontend 의 디자인과 동시에 project 의 기능을 같이 논하였습니다.   
@@ -102,7 +109,8 @@
         
     * <details>
         <summary>그리드</summary>
-        
+        <br>
+
         그리드를 만드는데 2가지 방법을 사용하였습니다.   
         <br>
         그리드를 활용한 방법   
@@ -150,9 +158,11 @@
 
     * <details>
         <summary>기능구현</summary>
-  
+        <br>
+
+        ## 대부분의 기능들은 ajax
         기능의 경우 대부분 백엔드의 api들을 ajax를 통하여 받아 front에 표기하는 형식이였습니다.
-        ```
+        ```javascript
         $.ajax({
         type: "POST",
         url: "/getdaily",
@@ -162,8 +172,8 @@
         }, ...
         ``` 
       
-        그 이후 이어지는 json을 풀어주는 코드
-        ```
+        그 이후 이어지는 json을 풀어주는 코드   
+        ```javascript
         success: function (response) {
                 if (response['res'] === true) {
                     console.log(response['msg']);
@@ -186,10 +196,63 @@
                     }
                 }
         ```
-      
-        그 외에도 많은 기능들을 필요에 따라 추가하게 되었습니다.   
-        
+        <br>
+
+        ## 쿠키를 구현하여 로그인을 유지하는 코드의 경우   
+        ```javascript
+        function login() {
+            let login_id = $("#login-id").val();
+            let login_password = $("#login-password").val();
+            $.ajax({
+                type: "POST",
+                url: "/login",
+                data: {
+                    id: login_id,
+                    pw: login_password,
+                },
+                success: function (response) {
+                    if (response['res'] === true) {
+                        //  로그인 성공
+                        setCookie('user_id', response['id'], 30)
+                        setCookie('login_checker', true, 30)
         ```
+        로그인이 성공되면 setCookie로 해당 parameter 들을 보냅니다.   
+        <br>
+
+        저장된 쿠키는 사이트가 로딩되는 대로 getCookie 함수로 받아들입니다.   
+        ```javascript
+        // 사이트 로딩끝나면 즉시 작동되는 함수들
+        $("document").ready(function () {
+            login_checker = getCookie('login_checker');
+            user_id = getCookie('user_id');
+            ...
+        ```
+        <br>
+
+
+        저장과 불러오기에 사용되는 getCookie(), setCookie()   
+        ```javascript
+        function getCookie(name) {
+            let value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+            return value ? value[2] : null;
+        }
+        ```
+
+        exp를 통하여 쿠키가 유효한 기간을 정합니다.   
+        ```javascript
+        function setCookie(name, value, exp) {
+            let date = new Date();
+            date.setTime(date.getTime() + exp * 60 * 1000);
+            document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+        }
+        ```
+        <br>
+        <br>
+      
+        ## 그외
+        추가적으로 많은 기능들도 필요에 따라 작성하게 되었습니다.   
+        
+        ```javascript
         // timetable 만드는 function
         function loadTimeTable()
       
@@ -231,6 +294,7 @@
 * ## Backend
     * <details>
         <summary>디자인</summary>
+        <br>
         
         API나 기능을 먼저 생각해보자는 의견도 있었지만   
         팀원분들과 의견을 나눈 결과   
@@ -248,6 +312,7 @@
           
     * <details>
         <summary>API</summary>
+        <br>
       
         모든 api는   
         `{ res : True/False, msg : "백엔드 메시지", val : 요청한 데이터 }`   
@@ -299,6 +364,7 @@
       
     * <details>
         <summary>DATABASE</summary>
+        <br>
 
         mongoDB는 일반 SQL DB와 다릅니다.   
         일반적인 SQL과 같은 경우에는 array를 저장할 수 없습니다.   
@@ -321,6 +387,7 @@
 
         * <details>
           <summary>array를 사용하지 않고 무식하게 저장한 방법 (75줄)</summary>
+            <br>
     
             ```python
             # POST(id, year, month, date, plan1/2/3_category, plan1/2/3_hour, plan1/2/3_description, immerse, about) -> 하루 저장
@@ -401,6 +468,7 @@
     
         * <details>
           <summary>array를 사용한 elegant한 방법 (19줄)</summary>
+            <br>
 
             ```python
             # POST(id, date, did(JSON)) -> daily table 저장
@@ -432,6 +500,7 @@
 
     * <details>
         <summary>기능구현</summary>
+        <br>
         
         백엔드의 기능은 pymongoDB로 받은 데이터베이스의 dict와 array를   
         frontend에서 표기하고 싶은데로 변형하고 return하는 것이였습니다.   
@@ -454,7 +523,7 @@
         필요한 형태로 변형합니다.   
         <br>
 
-        ex) def graph()의 한 부분
+        ex) def graph()의 한 부분 (형태변환)
         ```python
         # 0 ~ 23 까지의 각 시간값과 0 이 들어있는 리스트를 만듭니다.
         # list_no_saved = [ [0, 0], [1, 0], ..., [22, 0], [23, 0] ]

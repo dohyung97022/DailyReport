@@ -42,10 +42,18 @@
         // 오늘 날짜 변수
         let today = "";
 
+        //타임테이블 보는지, 데일리 보는지
+        let nowYouSee = 'timetable';
+
         // 사이트 로딩끝나면 즉시 작동되는 함수들
         $("document").ready(function () {
+            login_checker = getCookie('login_checker');
+            user_id = getCookie('user_id');
             loadTimeTable();
             setTodayAfterLoad();
+            if (login_checker === "true") {
+                login_success(user_id);
+            }
         });
 
         // timetable 만드는 function
@@ -111,12 +119,14 @@
         function changeToReportTable() {
             $(".daily-report-table-container").css({ display: "none" });
             $(".chart-grid-content").css({ display: "grid" });
+            nowYouSee = 'reporttable';
         }
 
         // timetable/daily report 보이는 것을 변환
         function changeToTimeTable() {
             $(".chart-grid-content").css({ display: "none" });
             $(".daily-report-table-container").css({ display: "block" });
+            nowYouSee = 'timetable';
         }
 
         // datepicker 버튼 설정
@@ -163,6 +173,12 @@
     <!-- JS 끝 -->
 
     <style>
+        /* general */
+        canvas {
+            height: 100% !important;
+            width: 100% !important;
+        }
+
         body {
             margin: 0;
         }
@@ -176,6 +192,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            text-align: center;
         }
 
         /* buttons */
@@ -213,7 +230,7 @@
             grid-area: item1;
             padding: 25px 25px 25px 25px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
         }
 
         .grid-item-2 {
@@ -227,7 +244,7 @@
             grid-area: item3;
             display: flex;
             padding: 50px 25px 50px 25px;
-            flex-direction: column;
+            /* flex-direction: column; */
             justify-content: space-between;
         }
 
@@ -243,15 +260,20 @@
             grid-area: item5;
         }
 
+        .grid-item-6 {
+            grid-area: item6;
+        }
+
         .grid-content {
             display: grid;
             width: 100%;
             grid-template-columns: 1fr 5fr;
-            grid-template-rows: 1fr 3fr 4fr;
+            grid-template-rows: 100px 160px 413px 1fr;
             grid-template-areas:
                 "item1 item2"
                 "item3 item5"
-                "item4 item5";
+                "item4 item5"
+                "item6 item5";
             padding: 3vw;
         }
 
@@ -287,28 +309,17 @@
         .chart-grid-content {
             display: none;
             width: 100%;
-            grid-template-columns: 30vw 40vw;
+            grid-template-columns: 3fr 4fr;
             grid-template-rows: 5vh 40vh 5vh 20vh;
             grid-template-areas:
                 "chart-item1 chart-item2"
                 "chart-item3 chart-item4"
                 "chart-item5 chart-item6"
                 "chart-item5 chart-item7";
-            padding: 3vw;
         }
 
         .chart-grid-content div {
-            border: 1px solid #444444;
-        }
-
-        #pieChart {
-            width: 100%;
-            height: 100%;
-        }
-
-        #lineChart {
-            width: 100%;
-            height: 100%;
+            border: 1px solid;
         }
 
         /* result report table */
@@ -344,13 +355,11 @@
 
         .daily-report-table-container {
             overflow: auto;
-            padding: 1vw;
         }
 
         th,
         td {
             text-align: center;
-            border: 1px solid #444444;
         }
 
         /* datepicker */
@@ -404,20 +413,99 @@
             text-align: center;
             padding-top: 60px;
         }
+
+        #login-success-area-container {
+            height: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0px 50px 0px 50px;
+        }
+
+        /* overall styler */
+        :root {
+            --text-color: #407076;
+            --border-color: #407076;
+            --background-color: none;
+            --input-background-color: none;
+            --table-background-color: none;
+            --button-background-color: #ededed;
+        }
+
+        h1,
+        i,
+        button,
+        td,
+        option,
+        div {
+            color: var(--text-color);
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+        }
+
+        h1,
+        i,
+        button,
+        td,
+        tr,
+        table,
+        input,
+        select,
+        div {
+            border-color: var(--border-color);
+        }
+
+        body {
+            background-color: var(--background-color);
+        }
+
+        button {
+            background-color: var(--button-background-color);
+        }
+
+        input,
+        select {
+            background-color: var(--input-background-color);
+        }
+
+        table,
+        .grid-item-5 {
+            background-color: var(--table-background-color);
+        }
     </style>
 </head>
 
 <body>
     <div class="main-container">
         <div class="grid-content">
-            <div class="grid-item-1">
+            <!-- 로고 -->
+            <div class="grid-item-1 txt-cntr">
+                <h1 class="">LOGO</h1>
+            </div>
+            <!-- <- today -> -->
+            <div class="grid-item-2">
+                <button onclick="left_button_click()" class="button-circle txt-cntr">
+                    <i class="fas fa-chevron-left fa-lg"></i>
+                </button>
+                <h1 id="current-date" class="txt-cntr" style="margin-bottom: 20px">
+                    Today
+                </h1>
+                <button onclick="right_button_click()" class="button-circle txt-cntr">
+                    <i class="fas fa-chevron-right fa-lg"></i>
+                </button>
+            </div>
+
+            <!-- account/calender/today -->
+            <div class="grid-item-3">
                 <div class="dropdown">
                     <button class="dropdown-toggle button-square txt-cntr" data-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false" onclick="show_dropdown()">
-                        Account
+                        <i class="fas fa-user-circle fa-2x"></i>
                     </button>
-
-
                     <div id="dropdown-menu-test" class="dropdown-menu">
                         <div id="dropdown-menu-container-test">
                             <form class="px-4 py-3">
@@ -437,7 +525,7 @@
                             <div class="dropdown-divider"></div>
                             <a onclick="showSignUpArea()" class="dropdown-item" href="#">회원가입</a>
                         </div>
-                        <div id="login-success-area-container-test" style="display: none;">
+                        <div id="login-success-area-container" style="display: none;">
                             <div id="login-success-area" class="login-success-area dropdown-menu">
                                 <div class="login-success-title"></div>
                             </div>
@@ -464,40 +552,27 @@
                     </div>
 
                 </div>
-                <input onchange="changeCurrentDate()" class="calender" type="hidden" id="datepicker" />
+                <input onchange="calender_date_click()" class="calender" type="hidden" id="datepicker" />
                 <button onclick="today_button_click()" class="button-square txt-cntr">
                     Today
                 </button>
             </div>
 
-            <div class="grid-item-2">
-                <button onclick="left_button_click()" class="button-circle txt-cntr">
-                    <i class="fas fa-chevron-left fa-lg"></i>
-                </button>
-                <h1 id="current-date" class="txt-cntr" style="margin-bottom: 20px">
-                    Today
-                </h1>
-                <button onclick="right_button_click()" class="button-circle txt-cntr">
-                    <i class="fas fa-chevron-right fa-lg"></i>
-                </button>
-            </div>
 
-            <div class="grid-item-3">
+
+            <div class="grid-item-4">
                 <button class="button-rectangle txt-cntr" id="save-button" onclick="save_timetable()">
                     저장
                 </button>
-                <button class="button-rectangle txt-cntr" id="time-table" onclick="changeToTimeTable()">
+                <button class="button-rectangle txt-cntr" id="time-table" onclick="time_table_button_click()">
                     time table
                 </button>
-                <button class="button-rectangle txt-cntr" id="daily-report" onclick="changeToReportTable()">
+                <button class="button-rectangle txt-cntr" id="daily-report" onclick="daily_report_button_click()">
                     daily report
-                </button>
-                <button class="button-rectangle txt-cntr" id="weekly-report">
-                    weekly report
                 </button>
             </div>
 
-            <div class="grid-item-4">
+            <div class="grid-item-6">
                 <h1 class="txt-cntr" id="time"></h1>
             </div>
 
@@ -513,72 +588,72 @@
                             <td colspan="1">할애시간</td>
                         </tr>
                         <tr>
-                            <td colspan="1">수면</td>
-                            <td colspan="1">5:40</td>
-                            <td colspan="1" rowspan="5">휴식</td>
-                            <td colspan="1" rowspan="5">10:15</td>
+                            <td class="small-0" colspan="1">수면</td>
+                            <td class="smalltime-0" colspan="1">0</td>
+                            <td class="big-0" colspan="1" rowspan="5">휴식</td>
+                            <td class="bigtime-0" colspan="1" rowspan="5">0</td>
                         </tr>
                         <tr>
-                            <td colspan="1">휴식</td>
-                            <td colspan="1">1:20</td>
+                            <td class="small-1" colspan="1">휴식</td>
+                            <td class="smalltime-1" colspan="1">0</td>
                         </tr>
                         <tr>
-                            <td colspan="1">정비</td>
-                            <td colspan="1">1:20</td>
+                            <td class="small-2" colspan="1">정비</td>
+                            <td class="smalltime-2" colspan="1">0</td>
                         </tr>
                         <tr>
-                            <td colspan="1">식사</td>
-                            <td colspan="1">1:20</td>
+                            <td class="small-3" colspan="1">식사</td>
+                            <td class="smalltime-3" colspan="1">0</td>
                         </tr>
                         <tr>
-                            <td colspan="1">간식</td>
-                            <td colspan="1">1:20</td>
+                            <td class="small-4" colspan="1">간식</td>
+                            <td class="smalltime-4" colspan="1">0</td>
                         </tr>
                         <!--  -->
                         <tr>
-                            <td colspan="1">업무</td>
-                            <td colspan="1">1:20</td>
-                            <td colspan="1" rowspan="3">업무</td>
-                            <td colspan="1" rowspan="3">5:45</td>
+                            <td class="small-5" colspan="1">업무</td>
+                            <td class="smalltime-5" colspan="1">0</td>
+                            <td class="big-1" colspan="1" rowspan="3">업무</td>
+                            <td class="bigtime-1" colspan="1" rowspan="3">0</td>
                         </tr>
                         <tr>
-                            <td colspan="1">강의</td>
-                            <td colspan="1">1:20</td>
+                            <td class="small-6" colspan="1">강의</td>
+                            <td class="smalltime-6" colspan="1">0</td>
                         </tr>
                         <tr>
-                            <td colspan="1">운전</td>
-                            <td colspan="1">1:20</td>
+                            <td class="small-7" colspan="1">운전</td>
+                            <td class="smalltime-7" colspan="1">0</td>
                         </tr>
                         <!--  -->
                         <tr>
-                            <td colspan="1">자기계발</td>
-                            <td colspan="1">1:20</td>
-                            <td colspan="1" rowspan="3">독서</td>
-                            <td colspan="1" rowspan="3">5:45</td>
+                            <td class="small-8" colspan="1">독서</td>
+                            <td class="smalltime-8" colspan="1">0</td>
+                            <td class="big-2" colspan="1" rowspan="3">자기계발</td>
+                            <td class="bigtime-2" colspan="1" rowspan="3">0</td>
                         </tr>
                         <tr>
-                            <td colspan="1">공부</td>
-                            <td colspan="1">1:20</td>
+                            <td class="small-9" colspan="1">공부</td>
+                            <td class="smalltime-9" colspan="1">0</td>
                         </tr>
                         <tr>
-                            <td colspan="1">운동</td>
-                            <td colspan="1">1:20</td>
+                            <td class="small-10" colspan="1">운동</td>
+                            <td class="smalltime-10" colspan="1">0</td>
                         </tr>
-                        <!--  -->
-                        <tr>
-                            <td colspan="1">기타</td>
-                            <td colspan="1">1:20</td>
-                            <td colspan="1" rowspan="3">여가</td>
-                            <td colspan="1" rowspan="3">5:45</td>
-                        </tr>
-                        <tr>
-                            <td colspan="1">폰질</td>
-                            <td colspan="1">1:20</td>
-                        </tr>
-                        <tr>
-                            <td colspan="1">기타</td>
-                            <td colspan="1">1:20</td>
-                        </tr>
+                        <!— —>
+                            <tr>
+                                <td class="small-11" colspan="1">여가</td>
+                                <td class="smalltime-11" colspan="1">0</td>
+                                <td class="big-3" colspan="1" rowspan="3">기타</td>
+                                <td class="bigtime-3" colspan="1" rowspan="3">0</td>
+                            </tr>
+                            <tr>
+                                <td class="small-12" colspan="1">폰질</td>
+                                <td class="smalltime-12" colspan="1">0</td>
+                            </tr>
+                            <tr>
+                                <td class="small-13" colspan="1">기타</td>
+                                <td class="smalltime-13" colspan="1">0</td>
+                            </tr>
                     </table>
                 </div>
                 <div class="chart-grid-item-4">
@@ -589,7 +664,7 @@
                 </div>
                 <div class="chart-grid-item-6 txt-cntr">오늘 평균 몰입도</div>
                 <div class="chart-grid-item-7 txt-cntr">
-                    <h1>4.7점</h1>
+                    <h1 class="score-average"></h1>
                 </div>
             </div>
 
@@ -637,73 +712,6 @@
         "Purple",
         "Orange",
     ];
-    let pieChartLabels = [];
-    var ctx = document.getElementById("lineChart").getContext("2d");
-    var myChart = new Chart(ctx, {
-        type: "line",
-        data: {
-            // label 여기에 데이터를 정의할 수 있습니다.
-            labels: lineChartLabels,
-            datasets: [
-                {
-                    label: "# of Votes",
-                    // data 여기의 데이터를 변경할 수 있습니다.
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: backgroundColors,
-                    borderColor: borderColors,
-                    borderWidth: 1,
-                },
-            ],
-        },
-        options: {
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-            },
-            scales: {
-                yAxes: [
-                    {
-                        ticks: {
-                            beginAtZero: true,
-                        },
-                    },
-                ],
-            },
-        },
-    });
-    var ctx = document.getElementById("pieChart").getContext("2d");
-    var myChart = new Chart(ctx, {
-        type: "pie",
-        data: {
-            // label 여기에 데이터를 정의할 수 있습니다.
-            labels: pieChartLabels,
-            datasets: [
-                {
-                    label: "# of Votes",
-                    //   data 여기의 데이터를 변경할 수 있습니다.
-                    data: [5, 12],
-                    backgroundColor: backgroundColors,
-                    borderColor: borderColors,
-                    borderWidth: 1,
-                },
-            ],
-        },
-        options: {
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-            },
-            scales: {
-                yAxes: [
-                    {
-                        ticks: {
-                            beginAtZero: true,
-                        },
-                    },
-                ],
-            },
-        },
-    });
 
     // account.js
     function clean_forms() {
@@ -746,6 +754,8 @@
             success: function (response) {
                 if (response['res'] === true) {
                     //  로그인 성공
+                    setCookie('user_id', response['id'], 30)
+                    setCookie('login_checker', true, 30)
                     login_checker = true;
                     user_id = response['id'];
                     login_success(user_id);
@@ -762,10 +772,19 @@
     function login_success(id) {
         $('#dropdown-menu-container-test').hide();
         $('#signup-area-test').hide();
-        let newData = `<h4>안녕하세요. ${id}님</h4>`;
-        $('#login-success-area-container-test').append(newData);
-        $('#login-success-area-container-test').show();
+        let newData = `<h4>안녕하세요.</h4> <h4>${id}님</h4><button type="button" onclick="logout()" class="logout-button btn btn-primary">
+                                로그아웃!
+                            </button>`;
+        $('#login-success-area-container').append(newData);
+        $('#login-success-area-container').show();
         get_timetable();
+    }
+
+    function logout() {
+        alert('로그아웃 되었습니다!');
+        deleteCookie('login_checker');
+        deleteCookie('user_id');
+        window.location.reload();
     }
 
     function submitSignupForm() {
@@ -792,8 +811,13 @@
         });
     }
 
+
     //timetable 저장하는 함수
     function save_timetable() {
+        if (login_checker == null || user_id == null) {
+            alert('로그인을 해주세요!');
+            return;
+        }
         let id = user_id;
         let date = $('#datepicker').val();
         let did = [];
@@ -834,6 +858,9 @@
     }
 
     function get_timetable() {
+        if (login_checker == null || user_id == null) {
+            return;
+        }
         let id = user_id;
         let date = $('#datepicker').val();
         let did = [];
@@ -847,8 +874,6 @@
             },
             success: function (response) {
                 if (response['res'] === true) {
-                    console.log(response['msg']);
-                    console.log(response['val']);
                     did = response['val']['did'];
                     for (let i = 0; i < did.length; i++) {
                         time_name = did[i]['time_name'];
@@ -862,8 +887,6 @@
                             $(`.time_${time_name} .time_long_${z}`).val(did[i]['time_did'][z - 1]['long']);
                             $(`.time_${time_name} .time_desc_${z}`).val(did[i]['time_did'][z - 1]['desc']);
                         }
-                        console.log(time_score)
-                        console.log(time_comment)
                         $(`.time_${time_name} .time_score`).val(time_score);
                         $(`.time_${time_name} .time_comment`).val(time_comment);
                     }
@@ -872,26 +895,86 @@
         });
     }
 
+    function time_table_button_click() {
+        clear_timetable();
+        changeToTimeTable();
+        get_timetable();
+    }
+
+    function daily_report_button_click() {
+        changeToReportTable();
+        loadResultTable();
+        loadResultLineGraph();
+        loadResultPieGraph();
+        loadResultAvrageImmerse();
+    }
+
     function left_button_click() {
         $('#datepicker').datepicker('setDate', "c-1d");
         changeCurrentDate();
-        clear_timetable()
-        get_timetable();
+        clear_timetable();
+        clearResultTable();
+        clearAllGraph();
+        if (nowYouSee === "timetable") {
+            changeToTimeTable();
+            get_timetable();
+        } else {
+            changeToReportTable();
+            loadResultTable();
+            loadResultLineGraph();
+            loadResultAvrageImmerse();
+        }
+
     }
 
     function right_button_click() {
         $('#datepicker').datepicker('setDate', "c+1d");
         changeCurrentDate();
         clear_timetable();
-        get_timetable();
-
+        clearResultTable();
+        clearAllGraph();
+        if (nowYouSee === "timetable") {
+            changeToTimeTable();
+            get_timetable();
+        } else {
+            changeToReportTable();
+            loadResultTable();
+            loadResultLineGraph();
+            loadResultAvrageImmerse();
+        }
     }
 
     function today_button_click() {
         toToday();
         changeCurrentDate();
-        clear_timetable()
-        get_timetable();
+        clear_timetable();
+        clearResultTable();
+        clearAllGraph();
+        if (nowYouSee === "timetable") {
+            changeToTimeTable();
+            get_timetable();
+        } else {
+            changeToReportTable();
+            loadResultTable();
+            loadResultLineGraph();
+            loadResultAvrageImmerse();
+        }
+    }
+
+    function calender_date_click() {
+        changeCurrentDate();
+        clear_timetable();
+        clearResultTable();
+        clearAllGraph();
+        if (nowYouSee === "timetable") {
+            changeToTimeTable();
+            get_timetable();
+        } else {
+            changeToReportTable();
+            loadResultTable();
+            loadResultLineGraph();
+            loadResultAvrageImmerse();
+        }
     }
 
     function clear_timetable() {
@@ -907,8 +990,211 @@
         }
     }
 
+    function setCookie(name, value, exp) {
+        let date = new Date();
+        date.setTime(date.getTime() + exp * 60 * 1000);
+        document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+    }
+
+    function getCookie(name) {
+        let value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        return value ? value[2] : null;
+    }
+
+    function deleteCookie(name) {
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
 
 
+    function loadResultTable() {
+        clearResultTable();
+        let id = user_id;
+        let date = $('#datepicker').val();
+
+        $.ajax({
+            type: "POST",
+            url: "/piechart",
+            data: {
+                id: id,
+                date: date,
+            },
+            success: function (response) {
+                //  파이차트 값
+                let small_keyList = Object.keys(response['val']);
+                let bigList = response['val']['category_sum'];
+                let big_keyList = Object.keys(bigList);
+                // 소카테고리들 채우기
+                for (let i = 0; i < small_keyList.length; i++) {
+                    for (z = 0; z < 14; z++) {
+                        if (small_keyList[i] === $(`.small-${z}`).text()) {
+                            $(`.smalltime-${z}`).text(response['val'][small_keyList[i]]);
+                            break;
+                        }
+                    }
+                }
+                //    큰 카테고리들
+                for (let i = 0; i < big_keyList.length; i++) {
+                    for (let x = 0; x < 4; x++) {
+                        if (big_keyList[i] === document.querySelector(`.big-${x}`).innerText) {
+                            document.querySelector(`.bigtime-${x}`).innerText = bigList[big_keyList[i]];
+                            break;
+                        }
+                    }
+                }
+                loadResultPieGraph();
+            },
+        });
+    }
+
+    function loadResultLineGraph() {
+        let id = user_id
+        let date = $('#datepicker').val()
+        $.ajax({
+            type: "POST",
+            url: "/graph",
+            data: {
+                id: id,
+                date: date,
+            },
+            success: function (response) {
+                //  파이차트 값
+                let label = Object.keys(response);
+                let vals = []
+                for (let i = 0; i < label.length; i++) {
+                    vals.push(response[label[i]]);
+                }
+                if (document.querySelector('#lineChart')) {
+                    document.querySelector('#lineChart').remove();
+                }
+                let newCanvas = document.createElement('canvas');
+                newCanvas.setAttribute('id', 'lineChart');
+                document.querySelector('.chart-grid-item-4').append(newCanvas);
+                var ctx = document.getElementById("lineChart").getContext("2d");
+                var myChart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        // label 여기에 데이터를 정의할 수 있습니다.
+                        labels: label,
+                        datasets: [
+                            {
+                                label: "Immerse by time",
+                                // data 여기의 데이터를 변경할 수 있습니다.
+                                data: vals,
+                                backgroundColor: backgroundColors,
+                                borderColor: borderColors,
+                                borderWidth: 1,
+                            },
+                        ],
+                    },
+                    options: {
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                        },
+                        scales: {
+                            yAxes: [
+                                {
+                                    ticks: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                });
+            },
+        });
+    }
+
+    function loadResultAvrageImmerse() {
+        let id = user_id;
+        let date = $('#datepicker').val();
+        if (id != null) {
+            $.ajax({
+                type: "POST",
+                url: "/avgimmerse",
+                data: {
+                    id: id,
+                    date: date,
+                },
+                success: function (response) {
+                    if (response['res'] == false) {
+                        alert(response['msg']);
+                        document.querySelector(".score-average").innerText = ``;
+                    }
+                    else {
+                        document.querySelector(".score-average").innerText = `${response['val']}점`;
+                    }
+                },
+            });
+        }
+    }
+
+    function loadResultPieGraph() {
+        let label = ['휴식', '업무', '자기계발', '기타'];
+        let vals = [];
+        for (let i = 0; i < 4; i++) {
+            vals.push(document.querySelector(`.bigtime-${i}`).innerText);
+        }
+        if (document.querySelector('#pieChart')) {
+            document.querySelector('#pieChart').remove();
+        }
+        let newCanvas = document.createElement('canvas');
+        newCanvas.setAttribute('id', 'pieChart');
+        document.querySelector('.chart-grid-item-5').append(newCanvas);
+        var ctx = document.getElementById("pieChart").getContext("2d");
+        var myChart = new Chart(ctx, {
+            type: "pie",
+            data: {
+                // label 여기에 데이터를 정의할 수 있습니다.
+                labels: label,
+                datasets: [
+                    {
+                        label: "# of Votes",
+                        //   data 여기의 데이터를 변경할 수 있습니다.
+                        data: vals,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1,
+                    },
+                ],
+            },
+            options: {
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                },
+                scales: {
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true,
+                            },
+                        },
+                    ],
+                },
+            },
+        });
+    }
+
+    function clearResultTable() {
+        for (let i = 0; i < 14; i++) {
+            $(`.smalltime-${i}`).text(0);
+        }
+        for (let i = 0; i < 4; i++) {
+            $(`.bigtime-${i}`).text(0);
+        }
+    }
+
+    function clearAllGraph() {
+        if (document.querySelector('#pieChart')) {
+            document.querySelector('#pieChart').remove();
+        }
+        if (document.querySelector('#lineChart')) {
+            document.querySelector('#lineChart').remove();
+        }
+
+    }
 </script>
 
 </html>
