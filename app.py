@@ -64,10 +64,7 @@ def signup():
         return {'res': True, 'msg': "회원가입이 완료되었습니다", 'id': id}
 
 
-# POST(id, date, did[
-# {time_name:0,time_did: [{do:'',long:'',desc:''},{do:'',long:'',desc:''},{do:'',long:'',desc:''}] ,time_score : '', time_comment : ''}
-# {time_name:1,time_did: [{do:'',long:'',desc:''},{do:'',long:'',desc:''},{do:'',long:'',desc:''}] ,time_score : '', time_comment : ''}
-# {time_name:2,time_did: [{do:'',long:'',desc:''},{do:'',long:'',desc:''},{do:'',long:'',desc:''}] ,time_score : '', time_comment : ''}
+# POST(id, date, did(JSON)) -> daily table 저장
 @app.route('/postdaily', methods=['POST'])
 def post_daily():
     # id,year,month,date 를 POST 의 body 에서 받습니다.
@@ -88,7 +85,7 @@ def post_daily():
         return {'res': True, 'msg': "해당 날짜의 데이터가 업데이트 되었습니다"}
 
 
-# POST (id, date) -> 규원님의 카톡 계획2 txt
+# POST (id, date) -> daily table 받기
 @app.route('/getdaily', methods=['POST'])
 def get_daily():
     # id,date 를 POST 의 body 에서 받습니다.
@@ -168,8 +165,8 @@ def piechart():
     id = request.form['id']
     date = request.form['date']  # ex) 2021-06-02
 
-    if id == '' or date == '':
-        return jsonify({'res': False, 'msg': "로그인되어있지 않습니다"})
+#     if id == '' or date == '':
+#         return jsonify({'res': False, 'msg': "로그인되어있지 않습니다"})
 
     # id, date 가 일치하는 데이터를 찾습니다.
     day_data = db.timeTable.find_one(
@@ -218,7 +215,7 @@ def piechart():
     return jsonify({'res': True, 'msg': "dailyreport/piechart 데이터를 받았습니다", 'val': sum_time})
 
 
-# POST (id, date) -> { "avg_immerse": 4.0 }
+# POST (id, date) -> date의 평균 몰입도 받기
 @app.route('/avgimmerse', methods=['POST'])
 def avgimmerse():
     # id,date 를 POST 의 body 에서 받습니다.
