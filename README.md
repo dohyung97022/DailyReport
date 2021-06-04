@@ -136,7 +136,7 @@
         ![](img/table.png)
         
         그리드와 테이블의 차이점이라고 한다면   
-        그리드의 경우 column과 row를 한칸마다 size를 구분할 수 있습니다.   
+        그리드의 경우 column과 row로 한칸마다 size를 구분할 수 있습니다.   
         ```
         grid-template-columns: 1fr 1fr; 
         grid-template-rows: 1fr 1fr 1fr;
@@ -144,7 +144,7 @@
         그리드는 테이블보다 조금 더 정확한 레이아웃을 구성하는데 좋습니다.   
         <br>
         반면 테이블의 경우 colspan과 rowspan을 통하여 td가 차지하는 정도를 구분지을 수 있습니다.   
-        CSS 에 지정된 그대로 grid/table 은 그 용어에 맞게 사용하는 것이 좋다고 생각했습니다.  
+        CSS 에 지정된 그대로 grid/table 은 그 용어에 맞게 사용하는 것이 좋다고 생각하였습니다.     
         </details>
         <br>
 
@@ -308,14 +308,14 @@
         ![](img/mongoDB_array.PNG)   
         <br>
 
-        처음에는 이 기능을 적극적으로 활용하지 못했습니다.   
-        one-to-many의 저장 형태도 구성하지 않았었습니다.   
+        시작하면서 이 기능을 적극적으로 활용하지 못했습니다.   
+        처음에는 one-to-many의 저장 형태도 구성하지 않았었습니다.   
         ![](img/no_mongo_array.PNG)   
         <br>
 
         category1, category2, category3 를 하나의 table에 저장하였지만   
         mongoDB에 array의 형태로 저장이 가능하다는 정보를 공유한      
-        팀원분 덕분에 더욱 간략하게 만들 수 있었습니다.   
+        규원님 덕분에 더욱 간략하게 만들 수 있었습니다.   
 
         <br>
 
